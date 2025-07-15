@@ -14,4 +14,5 @@ public interface AccountService {
     Account depositAmount(Long accountNumber, Double amount);
 
     Account withDrawAmount(Long accountNumber, Double amount);
+    void deletUser(Long accountNumber);
 }

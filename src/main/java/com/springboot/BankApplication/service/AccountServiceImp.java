@@ -52,4 +52,9 @@ public class AccountServiceImp implements AccountService {
         }
         return null;
     }
+
+    @Override
+    public void deletUser(Long accountNumber) {
+        accountRepository.deleteById(accountNumber);
+    }
 }
