@@ -14,11 +14,11 @@ public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long account_number;
+    private long accountNumber;
 
     @Column
-    private String account_holder_name;
+    private String accountHolderName;
 
     @Column
-    private Double account_balance;
+    private Double accountBalance;
 }

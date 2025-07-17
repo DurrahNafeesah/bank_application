@@ -1,10 +1,10 @@
 package com.springboot.BankApplication.controller;
 
-import com.springboot.BankApplication.entity.Account;
+import com.springboot.BankApplication.dto.AccountRequestDto;
+import com.springboot.BankApplication.dto.AccountResponseDto;
 import com.springboot.BankApplication.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,55 +17,33 @@ public class AccountController {
     private AccountService accountService;
 
     @PostMapping("/create")
-    public ResponseEntity<Account> createAccount(@RequestBody Account account) {
-        Account created = accountService.createAccount(account);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<AccountResponseDto> createAccount(@RequestBody AccountRequestDto requestDto) {
+        return ResponseEntity.ok(accountService.createAccount(requestDto));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Account> getAccountDetails(@PathVariable Long id) {
-        Account account = accountService.getAccountDetails(id);
-        if (account != null) {
-            return ResponseEntity.ok(account);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    @GetMapping("/{accountId}")
+    public ResponseEntity<AccountResponseDto> getAccountDetails(@PathVariable Long accountId) {
+        return ResponseEntity.ok(accountService.getAccountDetailsById(accountId));
     }
 
-    @GetMapping("/accounts")
-    public ResponseEntity<List<Account>> getAllAccounts() {
-        return ResponseEntity.ok(accountService.getAllAcount());
+    @GetMapping("/AllAccounts")
+    public ResponseEntity<List<AccountResponseDto>> getAllAccounts() {
+        return ResponseEntity.ok(accountService.getAllAccounts());
     }
 
-    @PutMapping("/deposit/{id}")
-    public ResponseEntity<Account> deposit(@PathVariable Long id, @RequestParam Double amount) {
-        Account updated = accountService.depositAmount(id, amount);
-        if (updated != null) {
-            return ResponseEntity.ok(updated);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    @PutMapping("/deposit/{accountId}")
+    public ResponseEntity<AccountResponseDto> depositAmount(@PathVariable Long accountId, @RequestParam Double amount) {
+       return ResponseEntity.ok(accountService.depositAmount(accountId,amount));
     }
 
-    @PutMapping("/withdraw/{id}")
-    public ResponseEntity<Account> withdraw(@PathVariable Long id, @RequestParam Double amount) {
-        Account updated = accountService.withDrawAmount(id, amount);
-        if (updated != null) {
-            return ResponseEntity.ok(updated);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    @PutMapping("/withdraw/{accountId}")
+    public ResponseEntity<AccountResponseDto> withDrawAmount(@PathVariable Long accountId, @RequestParam Double amount) {
+        return ResponseEntity.ok(accountService.withDrawAmount(accountId,amount));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
-        Account account = accountService.getAccountDetails(id);
-        if (account != null) {
-            accountService.deletUser(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-}
+    @DeleteMapping("/{accountId}")
+    public ResponseEntity<Void> deleteAccount(@PathVariable Long accountId) {
+        accountService.deleteUser(accountId);
+        return ResponseEntity.noContent().build();
+    }
 }
