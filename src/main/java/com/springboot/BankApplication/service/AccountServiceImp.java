@@ -7,6 +7,10 @@ import com.springboot.BankApplication.exception.ResourceNotFoundException;
 import com.springboot.BankApplication.mapper.AccountMapper;
 import com.springboot.BankApplication.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +25,9 @@ public class AccountServiceImp implements AccountService {
     @Autowired
     private AccountMapper accountMapper;
 
+    @Autowired
+    private CacheManager cacheManager;
+
     @Override
     public AccountResponseDto createAccount(AccountRequestDto requestDto) {
         Account account = accountMapper.toEntity(requestDto);
@@ -29,14 +36,18 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
+    @Cacheable("customers")
     public AccountResponseDto getAccountDetailsById(Long accountNumber) {
+        System.out.println("Fetching from DB - not cache");
         return accountRepository.findById(accountNumber)
                 .map(accountMapper::toResponseDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found with ID: " + accountNumber));
     }
 
     @Override
+    @Cacheable("customers")
     public List<AccountResponseDto> getAllAccounts() {
+        System.out.println("Fetching from DB - not cache");
         List<Account> accounts = accountRepository.findAll();
         if (accounts.isEmpty()) {
             throw new ResourceNotFoundException("No accounts found.");
@@ -47,7 +58,9 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
+    @CachePut(value="customers",key="#accountNumber")
     public AccountResponseDto depositAmount(Long accountNumber, Double amount) {
+        System.out.println("Updating cache for account: " + accountNumber);
         Account account = accountRepository.findById(accountNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found with ID: " + accountNumber));
         account.setAccountBalance(account.getAccountBalance() + amount);
@@ -55,7 +68,9 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
+    @CachePut(value="customers",key="#accountNumber")
     public AccountResponseDto withDrawAmount(Long accountNumber, Double amount) {
+        System.out.println("Updating cache for account: " + accountNumber);
         Account account = accountRepository.findById(accountNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found with ID: " + accountNumber));
 
@@ -68,7 +83,9 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
+    @CacheEvict(value="customers",allEntries = true)
     public void deleteUser(Long accountNumber) {
+        System.out.println("Cache cleared after account deletion: " + accountNumber);
         if (!accountRepository.existsById(accountNumber)) {
             throw new ResourceNotFoundException("Account not found for deletion with ID: " + accountNumber);
         }
