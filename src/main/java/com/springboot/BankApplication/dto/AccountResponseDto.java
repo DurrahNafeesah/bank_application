@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 @Data
 public class AccountResponseDto implements Serializable {
-    private String accountNumber;
+    private Long accountNumber;
     private String accountHolderName;
     private Double accountBalance;
 }

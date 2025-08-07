@@ -50,7 +50,7 @@ public class AccountController {
     }
 
     @DeleteMapping("/{accountId}")
-    @Operation(summary = "delete the amount by account ID")
+    @Operation(summary = "delete the account by ID")
     public ResponseEntity<Void> deleteAccount(@PathVariable Long accountId) {
         accountService.deleteUser(accountId);
         return ResponseEntity.noContent().build();
